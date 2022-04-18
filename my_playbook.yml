@@ -1,0 +1,55 @@
+---
+- name: build
+  hosts: build
+  become: yes
+
+  tasks:
+  - name: install default-jdk
+    apt:
+     name: default-jdk
+     state: present
+     update_cache: yes
+
+  - name: install maven
+    apt:
+     name: maven
+     state: present
+
+  - name: install git
+    apt:
+     name: git
+     state: present
+
+  - name: git clone
+    git:
+     repo: https://github.com/boxfuse/boxfuse-sample-java-war-hello.git
+     dest: /tmp
+     clone: yes
+     update: yes
+
+  - name: mvn package
+    shell: mvn package
+    args:
+      chdir: /tmp/boxfuse-sample-java-war-hello
+
+- name: copy file from first host to second host
+  synchronize:
+    src: /tmp/boxfuse-sample-java-war-hello
+    dest: /tmp/boxfuse-sample-java-war-hello
+    delegate_to: 51.250.80.172
+
+- name: prod
+  hosts: prod
+  become: yes
+
+  tasks:
+  - name: install tomcat9
+    apt:
+     name: tomcat9
+     state: present
+     update_cache: yes
+
+  - name: copy file to webapp
+    copy:
+      src: /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war
+      dest: /usr/local/tomcat/webapps/
