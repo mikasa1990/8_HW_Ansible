@@ -32,10 +32,11 @@
     args:
       chdir: /opt/boxfuse-sample-java-war-hello
 
-  - name: copy file from remote host to local
-    fetch:
-      src: /opt/boxfuse-sample-java-war-hello/target/hello-1.0.war
-      dest: /opt
+  - name: copy file from first host to second host
+    synchronize:
+      src: /opt/boxfuse-sample-java-war-hello
+      dest: /opt/boxfuse-sample-java-war-hello
+    delegate_to: 51.250.81.172
 
 - name: prod
   hosts: prod
@@ -50,5 +51,5 @@
 
   - name: copy file to webapp
     ansible.builtin.copy:
-      src: /opt/51.250.65.144/opt/boxfuse-sample-java-war-hello/target/hello-1.0.war
+      src: /opt/boxfuse-sample-java-war-hello/target/hello-1.0.war
       dest: /var/lib/tomcat9/webapps/
